@@ -99,7 +99,7 @@ class BaseConfigHelper
      * @param  string $value 配置值
      * @return array|string
      */
-    private static function _parse($type, $value)
+    protected static function _parse($type, $value)
     {
         switch ($type) {
             case 3 :

@@ -91,10 +91,10 @@ abstract class BaseApiController extends Rest{
         // 1. 请求客服端版本、类型信息
         $appType = Request::instance()->param("app_type","");
         $appVersion = Request::instance()->param("app_version","");
-        if (!empty($appType)) {
+        if (empty($appType)) {
             throw new BusinessException(lang('lack_parameter', ['param'=>'app_type']));
         }
-        if (!empty($appVersion)) {
+        if (empty($appVersion)) {
             throw new BusinessException(lang('lack_parameter', ['param'=>'app_version']));
         }
 

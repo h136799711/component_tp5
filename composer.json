@@ -1,0 +1,37 @@
+{
+  "name": "itboye/component_tp5",
+  "description": "book store resource api",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "itboye",
+    "h136799711"
+  ],
+  "minimum-stability": "dev",
+  "authors": [
+    {
+      "name": "hebidu",
+      "email": "hebiduhebi@126.com",
+      "role": "developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "by\\component\\": "src/"
+    }
+  },
+  "repositories": {
+    "packagist": {
+      "type": "composer",
+      "url": "https://packagist.phpcomposer.com"
+    }
+  },
+  "require": {
+    "php": ">=5.6",
+    "topthink/framework": "5.0.12",
+    "itboye/architecture": "dev-master"
+  },
+  "require-dev": {
+    "topthink/think-testing": "dev-master"
+  }
+}

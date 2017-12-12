@@ -56,8 +56,8 @@ abstract class BaseIndexController extends BaseApiController
             $this->apiReturnErr("type参数不正确!", BaseErrorCode::Invalid_Parameter);
         }
 
-        $this->domainName = $api_type[1];
-        $this->methodName = $api_type[0];
+        $this->methodName = $api_type[1];
+        $this->domainName = $api_type[0];
 
         if ($module == 'default') {
             $module = "domain";

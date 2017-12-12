@@ -18,7 +18,6 @@ namespace by\component\api\controller;
 
 
 use by\component\api\constants\BaseErrorCode;
-use by\component\helper\ReflectionHelper;
 use by\infrastructure\base\CallResult;
 
 abstract class BaseIndexController extends BaseApiController
@@ -43,16 +42,9 @@ abstract class BaseIndexController extends BaseApiController
         return $this->methodName;
     }
 
-    /**
-     *
-     */
-    public function index()
-    {
-        $this->getDomainObject();
-    }
-
     protected function getDomainObject()
     {
+
         // 已登录会话ID
         $module = $this->getModuleName();
         $serviceType = $this->allData->getServiceType();
@@ -91,8 +83,9 @@ abstract class BaseIndexController extends BaseApiController
     protected function callMethod()
     {
         // 4. 调用方法, 反射注入参数
-        $callResult = ReflectionHelper::invokeWithArgs($this->domainObject, $this->getMethodName(), $this->allData);
-//        $callResult = $object->$actionName();
+//        $callResult = ReflectionHelper::invokeWithArgs($this->domainObject, $this->getMethodName(), $this->allData);
+        $methodName = $this->getMethodName();
+        $callResult = $this->domainObject->$methodName();
         if ($callResult instanceof CallResult) {
             if ($callResult->isSuccess()) {
                 $this->apiReturnSuc($callResult);
@@ -108,7 +101,7 @@ abstract class BaseIndexController extends BaseApiController
      * 1. 用于未来对接口进行业务拆分、按使用场景进行拆分  比如针对第三方的接口、针对PC的接口
      * @return string
      */
-    private function getModuleName()
+    protected function getModuleName()
     {
         $data = $this->allData->getData();
         $module_name = isset($data['by_m']) ? ($data['by_m']) : "";

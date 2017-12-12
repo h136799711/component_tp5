@@ -10,7 +10,6 @@ namespace by\component\api\controller;
 
 use by\component\api\entity\ApiCommonEntity;
 use by\component\encrypt\interfaces\TransportInterface;
-use by\component\tp5\base\exception\BusinessException;
 use by\infrastructure\base\CallResult;
 use think\controller\Rest;
 use think\Request;
@@ -38,18 +37,13 @@ abstract class BaseApiController extends Rest{
      */
     protected $transport;
 
+
     /**
      * Base constructor.
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     * @throws BusinessException
      */
     public function __construct(){
-
         $this->allData = new ApiCommonEntity();
         parent::__construct();
-        $this->_initialize();
     }
 
     /**
@@ -62,53 +56,69 @@ abstract class BaseApiController extends Rest{
 
     abstract function getProjectId();
 
-    abstract function getClientId();
+    public function getClientId()
+    {
+        return $this->allData->getClientId();
+    }
 
     abstract function getClientSecret();
 
     abstract function getApiAlg();
 
-    abstract function getTransport($data);
+    abstract function getTransport();
+
+    public function readyRequiredParams()
+    {
+        // 1. 请求客服端版本、类型信息
+        $this->allData->setAppType(Request::instance()->param("app_type", ""));
+        $this->allData->setAppVersion(Request::instance()->param("app_version", ""));
+        if (empty($this->allData->getAppType())) {
+            $this->apiReturnErr(lang('lack_parameter', ['param' => 'app_type']));
+        }
+        if (empty($this->allData->getAppVersion())) {
+            $this->apiReturnErr(lang('lack_parameter', ['param' => 'app_version']));
+        }
+
+        $this->allData->setClientId($this->_param("client_id", "", lang('lack_parameter', ['param' => 'client_id'])));
+        if (empty($this->getClientId())) {
+            $this->apiReturnErr(lang('lack_parameter', ['param' => 'client_id']));
+        }
+
+    }
 
     /**
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
-     * @throws BusinessException
      */
-    public function _initialize(){
-        // 1. 请求客服端版本、类型信息
-        $appType = Request::instance()->param("app_type","");
-        $appVersion = Request::instance()->param("app_version","");
-        if (empty($appType)) {
-            throw new BusinessException(lang('lack_parameter', ['param'=>'app_type']));
-        }
-        if (empty($appVersion)) {
-            throw new BusinessException(lang('lack_parameter', ['param'=>'app_version']));
-        }
+    public function readyAllData()
+    {
 
         // 3. 获取传输算法类型
-
         $data = Request::instance()->param();
         $data['client_id'] = $this->getClientId();
+        echo $this->getClientId();
+        exit;
         $data['client_secret'] = $this->getClientSecret();
+        echo $this->getClientSecret();
+        exit;
 
-        $this->transport = $this->getTransport($data);
+        $this->transport = $this->getTransport();
 
         // 4. 解密数据并转换成 ApiCommonEntity
         $requestParams = $this->transport->decrypt([]);
         if (!array_key_exists('by_api_ver', $requestParams)) {
-            throw new BusinessException(lang('lack_parameter', ['param'=>'by_api_ver']));
+            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_api_ver']));
         }
 
         if (!array_key_exists('by_type', $requestParams)) {
-            throw new BusinessException(lang('lack_parameter', ['param'=>'by_type']));
+            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_type']));
         }
         if (!array_key_exists('by_notify_id', $requestParams)) {
-            throw new BusinessException(lang('lack_parameter', ['param'=>'by_notify_id']));
+            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_notify_id']));
         }
         if (!array_key_exists('by_time', $requestParams)) {
-            throw new BusinessException(lang('lack_parameter', ['param'=>'by_time']));
+            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_time']));
         }
 
         // 5. 先初始化
@@ -116,8 +126,6 @@ abstract class BaseApiController extends Rest{
         $this->allData->setClientSecret($this->getClientSecret());
         $this->allData->setProjectId($this->getProjectId());
         $this->allData->setLang($this->getLang());
-        $this->allData->setAppType(strtolower($appType));
-        $this->allData->setAppVersion(strtolower($appVersion));
         $this->allData->setAppRequestTime($requestParams['by_time']);
         $this->allData->setNotifyId($requestParams['by_notify_id']);
         $this->allData->setServiceVersion($requestParams['by_api_ver']);

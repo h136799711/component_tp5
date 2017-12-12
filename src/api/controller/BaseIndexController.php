@@ -84,7 +84,7 @@ abstract class BaseIndexController extends BaseApiController
     protected function callMethod()
     {
         // 4. 调用方法, 反射注入参数
-        $callResult = ReflectionHelper::invokeWithArgs($this->domainObject, $this->getMethodName(), $this->allData);
+        $callResult = ReflectionHelper::invokeWithArgs($this->domainObject, $this->getMethodName(), $this->allData->getData());
 //        $methodName = $this->getMethodName();
 //        $callResult = $this->domainObject->$methodName();
         if ($callResult instanceof CallResult) {

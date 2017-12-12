@@ -18,10 +18,8 @@ namespace by\component\api\controller;
 
 
 use by\component\api\constants\BaseErrorCode;
-use by\component\tp5\base\exception\BusinessException;
-use by\component\tp5\helper\ExceptionHelper;
+use by\component\helper\ReflectionHelper;
 use by\infrastructure\base\CallResult;
-use think\Exception;
 
 abstract class BaseIndexController extends BaseApiController
 {
@@ -50,60 +48,62 @@ abstract class BaseIndexController extends BaseApiController
      */
     public function index()
     {
-        try {
+        $object = $this->preProcess();
+        $this->process($object, $this->getMethodName());
+    }
 
-            // 已登录会话ID
-            $module = $this->getModuleName();
-            $serviceType = $this->allData->getServiceType();
+    protected function preProcess()
+    {
+        // 已登录会话ID
+        $module = $this->getModuleName();
+        $serviceType = $this->allData->getServiceType();
 
-            $api_type = preg_replace("/_/", "/", substr(trim($serviceType), 3), 1);
-            $api_type = preg_split("/\//", $api_type);
+        $api_type = preg_replace("/_/", "/", substr(trim($serviceType), 3), 1);
+        $api_type = preg_split("/\//", $api_type);
 
-            if (count($api_type) < 2) {
-                $this->apiReturnErr("type参数不正确!", BaseErrorCode::Invalid_Parameter);
-            }
+        if (count($api_type) < 2) {
+            $this->apiReturnErr("type参数不正确!", BaseErrorCode::Invalid_Parameter);
+        }
 
-            $action_name = $api_type[1];
-            $controller_name = $api_type[0];
-            $this->domainName = $controller_name;
-            $this->methodName = $action_name;
+        $this->domainName = $api_type[1];
+        $this->methodName = $api_type[0];
 
-            if ($module == 'default') {
-                $module = "domain";
+        if ($module == 'default') {
+            $module = "domain";
+        } else {
+            $module = $module . "_domain";
+        }
+
+        $clsName = "by\\$module\\" . $this->domainName . 'Domain';
+        if (!class_exists($clsName, true)) {
+            $this->apiReturnErr(lang('err_404'), BaseErrorCode::Not_Found_Resource);
+        }
+
+        // 3. 初始化业务类
+        $object = new $clsName($this->transport, $this->allData);
+
+        if (!method_exists($object, $this->methodName)) {
+            $this->apiReturnErr('api-' . lang('err_404'), BaseErrorCode::Not_Found_Resource);
+        }
+
+        return $object;
+
+    }
+
+    protected function process($object, $actionName)
+    {
+        // 4. 调用方法, 反射注入参数
+        $callResult = ReflectionHelper::invokeWithArgs($object, $actionName, $this->allData);
+//        $callResult = $object->$actionName();
+        if ($callResult instanceof CallResult) {
+            if ($callResult->isSuccess()) {
+                $this->apiReturnSuc($callResult);
             } else {
-                $module = $module . "_domain";
+                $this->apiReturnErr($callResult);
             }
-
-            $cls_name = "by\\$module\\" . $controller_name . 'Domain';
-            if (!class_exists($cls_name, true)) {
-                $this->apiReturnErr(lang('err_404'), BaseErrorCode::Not_Found_Resource);
-            }
-
-            // 3. 初始化业务类
-            $object = new $cls_name($this->transport, $this->allData);
-
-            if (!method_exists($object, $action_name)) {
-                $this->apiReturnErr('api-' . lang('err_404'), BaseErrorCode::Not_Found_Resource);
-            }
-
-            // 4. 调用方法, 反射注入参数
-//            $callResult = ReflectionHelper::invokeWithArgs($object, $action_name, $this->allData);
-            $callResult = $object->$action_name();
-            if ($callResult instanceof CallResult) {
-                if ($callResult->isSuccess()) {
-                    $this->apiReturnSuc($callResult);
-                } else {
-                    $this->apiReturnErr($callResult);
-                }
-            }
-
-            throw new BusinessException($cls_name . $action_name . ' 必须返回CallResult对象');
-        } catch (BusinessException $businessException) {
-            $this->apiReturnErr($businessException->getMessage(), $businessException->getCode());
-        } catch (Exception $ex) {
-            $this->apiReturnErr(ExceptionHelper::getErrorString($ex), BaseErrorCode::Business_Error);
         }
     }
+
 
     /**
      * 获取接口模块名称

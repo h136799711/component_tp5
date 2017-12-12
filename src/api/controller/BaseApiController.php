@@ -67,6 +67,11 @@ abstract class BaseApiController extends Rest{
 
     abstract function getTransport();
 
+    /**
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function readyRequiredParams()
     {
         // 1. 请求客服端版本、类型信息
@@ -84,6 +89,12 @@ abstract class BaseApiController extends Rest{
             $this->apiReturnErr(lang('lack_parameter', ['param' => 'client_id']));
         }
 
+        $this->allData->setLang($this->getLang());
+
+        $data = Request::instance()->param();
+        $data['client_id'] = $this->getClientId();
+        $data['client_secret'] = $this->getClientSecret();
+        $this->allData->setData($data);
     }
 
     /**
@@ -93,11 +104,6 @@ abstract class BaseApiController extends Rest{
      */
     public function readyAllData()
     {
-
-        // 3. 获取传输算法类型
-        $data = Request::instance()->param();
-        $data['client_id'] = $this->getClientId();
-        $data['client_secret'] = $this->getClientSecret();
 
         $this->transport = $this->getTransport();
 
@@ -118,6 +124,7 @@ abstract class BaseApiController extends Rest{
         }
 
         // 5. 先初始化
+        $this->allData->setData([]);
         $this->allData->setClientId($this->getClientId());
         $this->allData->setClientSecret($this->getClientSecret());
         $this->allData->setProjectId($this->getProjectId());

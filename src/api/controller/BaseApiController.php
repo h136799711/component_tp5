@@ -6,17 +6,11 @@
  * Time: 20:22
  */
 
-namespace by\component\tp5\controller;
+namespace by\component\api\controller;
 
-
-use by\api\config\ApiConfigHelper;
-use by\api\constants\ErrorCode;
-use by\api\controller\entity\ApiCommonEntity;
-use by\component\base\exception\BusinessException;
-use by\component\encrypt\factory\TransportFactory;
+use by\component\api\entity\ApiCommonEntity;
 use by\component\encrypt\interfaces\TransportInterface;
-use by\component\oauth2\entity\OauthClientsEntity;
-use by\component\oauth2\logic\OauthClientsLogic;
+use by\component\tp5\base\exception\BusinessException;
 use by\infrastructure\base\CallResult;
 use think\controller\Rest;
 use think\Request;
@@ -64,22 +58,17 @@ abstract class BaseApiController extends Rest{
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    private function getLang()
-    {
-        $lang = Request::instance()->get("lang","zh-cn");
-        // 检查语言是否支持
-        $lang_support = ApiConfigHelper::getConfig('lang_support');
-        $is_support = false;
-        if (is_array($lang_support)) {
-            $is_support = in_array($lang, $lang_support);
-        }
+    abstract function getLang();
 
-        if (!$is_support) {
-            //对于不支持的语言都使用zh-cn
-            $lang = "zh-cn";
-        }
-        return strtolower($lang);
-    }
+    abstract function getProjectId();
+
+    abstract function getClientId();
+
+    abstract function getClientSecret();
+
+    abstract function getApiAlg();
+
+    abstract function getTransport($data);
 
     /**
      * @throws \think\db\exception\DataNotFoundException
@@ -98,19 +87,14 @@ abstract class BaseApiController extends Rest{
             throw new BusinessException(lang('lack_parameter', ['param'=>'app_version']));
         }
 
-        // 2. 获取应用id
-        $client_id = $this->_param("client_id","", lang('lack_parameter',['param'=>'client_id']));
-        $logic = new OauthClientsLogic();
-        $result = $logic->getInfo(['client_id'=>$client_id]);
-        if(!($result instanceof OauthClientsEntity)){
-            $this->apiReturnErr(lang('err_client_id_not_exists', ['client_id'=>$client_id]),ErrorCode::Invalid_Parameter);
-        }
         // 3. 获取传输算法类型
-        $alg = $result->getApiAlg();
+
         $data = Request::instance()->param();
-        $data['client_id'] = $result->getClientId();
-        $data['client_secret'] = $result->getClientSecret();
-        $this->transport = TransportFactory::getAlg($alg, $data);
+        $data['client_id'] = $this->getClientId();
+        $data['client_secret'] = $this->getClientSecret();
+
+        $this->transport = $this->getTransport($data);
+
         // 4. 解密数据并转换成 ApiCommonEntity
         $requestParams = $this->transport->decrypt([]);
         if (!array_key_exists('by_api_ver', $requestParams)) {
@@ -128,9 +112,9 @@ abstract class BaseApiController extends Rest{
         }
 
         // 5. 先初始化
-        $this->allData->setClientId($result->getClientId());
-        $this->allData->setClientSecret($result->getClientSecret());
-        $this->allData->setProjectId($result->getProjectId());
+        $this->allData->setClientId($this->getClientId());
+        $this->allData->setClientSecret($this->getClientSecret());
+        $this->allData->setProjectId($this->getProjectId());
         $this->allData->setLang($this->getLang());
         $this->allData->setAppType(strtolower($appType));
         $this->allData->setAppVersion(strtolower($appVersion));

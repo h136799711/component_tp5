@@ -97,11 +97,7 @@ abstract class BaseApiController extends Rest{
         // 3. 获取传输算法类型
         $data = Request::instance()->param();
         $data['client_id'] = $this->getClientId();
-        echo $this->getClientId();
-        exit;
         $data['client_secret'] = $this->getClientSecret();
-        echo $this->getClientSecret();
-        exit;
 
         $this->transport = $this->getTransport();
 

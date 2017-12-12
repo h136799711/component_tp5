@@ -43,6 +43,14 @@ abstract class BaseIndexController extends BaseApiController
         return $this->methodName;
     }
 
+    /**
+     *
+     */
+    public function index()
+    {
+        $this->getDomainObject();
+    }
+
     protected function getDomainObject()
     {
         // 已登录会话ID

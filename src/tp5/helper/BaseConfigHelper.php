@@ -19,6 +19,8 @@ use think\exception\DbException;
 class BaseConfigHelper
 {
 
+    const GLOBAL_CONFIG_CACHE_NAME = 'by_tp5_g_config';
+
     public static function __callStatic($name, $arguments)
     {
         return Config::get($name);
@@ -70,7 +72,7 @@ class BaseConfigHelper
      */
     static public function initGlobalConfig($cacheTime = 86400)
     {
-        $config = Cache::get('by_tp5_g_config');
+        $config = Cache::get(self::GLOBAL_CONFIG_CACHE_NAME);
         if ($config === false) {
             $map = array();
             $fields = 'type,name,value';
@@ -81,13 +83,13 @@ class BaseConfigHelper
             if (is_array($result)) {
                 foreach ($result as $cfg) {
                     if ($cfg instanceof ConfigEntity) {
-                        $config[$cfg->getName()] = self::_parse($cfg->getType(), $cfg->getValue());
+                        $config[$cfg->getName()] = self::parse($cfg->getType(), $cfg->getValue());
                     }
                 }
             }
 
             // 缓存配置$cacheTime秒
-            Cache::set("by_tp5_g_config", $config, $cacheTime);
+            Cache::set(self::GLOBAL_CONFIG_CACHE_NAME, $config, $cacheTime);
         }
 
         return $config;
@@ -99,7 +101,7 @@ class BaseConfigHelper
      * @param  string $value 配置值
      * @return array|string
      */
-    protected static function _parse($type, $value)
+    public static function parse($type, $value)
     {
         switch ($type) {
             case 3 :

@@ -25,6 +25,7 @@ abstract class BaseIndexController extends BaseApiController
 {
     private $domainName;
     private $methodName;
+    private $domainObject;
 
     /**
      * @return mixed
@@ -42,17 +43,7 @@ abstract class BaseIndexController extends BaseApiController
         return $this->methodName;
     }
 
-
-    /**
-     * 接口入口
-     */
-    public function index()
-    {
-        $object = $this->preProcess();
-        $this->process($object, $this->getMethodName());
-    }
-
-    protected function preProcess()
+    protected function getDomainObject()
     {
         // 已登录会话ID
         $module = $this->getModuleName();
@@ -86,14 +77,13 @@ abstract class BaseIndexController extends BaseApiController
             $this->apiReturnErr('api-' . lang('err_404'), BaseErrorCode::Not_Found_Resource);
         }
 
-        return $object;
-
+        $this->domainObject = $object;
     }
 
-    protected function process($object, $actionName)
+    protected function callMethod()
     {
         // 4. 调用方法, 反射注入参数
-        $callResult = ReflectionHelper::invokeWithArgs($object, $actionName, $this->allData);
+        $callResult = ReflectionHelper::invokeWithArgs($this->domainObject, $this->getMethodName(), $this->allData);
 //        $callResult = $object->$actionName();
         if ($callResult instanceof CallResult) {
             if ($callResult->isSuccess()) {

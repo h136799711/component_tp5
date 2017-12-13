@@ -275,7 +275,7 @@ abstract class BaseLogic implements BaseLogicInterface
         }
 
         if (!is_array($entity)) {
-            throw new Exception('error entity paramter');
+            throw new Exception('parameter invalid');
         }
 
         $result = $this->model->data($entity)->isUpdate(false)->save();

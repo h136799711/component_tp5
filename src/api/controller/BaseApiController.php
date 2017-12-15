@@ -107,8 +107,9 @@ abstract class BaseApiController extends Rest{
 
         $this->transport = $this->getTransport();
 
+        $data = Request::instance()->param();
         // 4. 解密数据并转换成 ApiCommonEntity
-        $requestParams = $this->transport->decrypt([]);
+        $requestParams = $this->transport->decrypt($data);
         if (!array_key_exists('by_api_ver', $requestParams)) {
             $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_api_ver']));
         }

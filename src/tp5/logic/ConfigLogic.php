@@ -17,7 +17,39 @@
 namespace by\component\tp5\logic;
 
 
+use by\infrastructure\helper\CallResultHelper;
+
 class ConfigLogic extends BaseLogic
 {
+    /**
+     * 设置
+     * @param $config
+     * @return \by\infrastructure\base\CallResult
+     */
+    public function set($config)
+    {
+        $effects = 0;
+        $result = false;
+        if ($config && is_array($config)) {
+            $flag = true;
+            foreach ($config as $name => $value) {
+                $map = array('name' => $name);
+                $result = $this->getModel()->where($map)->setField('value', $value);
+                if ($result !== false) {
+                    $effects = $effects + $result;
+                } else {
+                    $flag = false;
+                }
+            }
+            if ($flag !== false) {
+                $result = $effects;
+            }
+        }
 
+        if ($result === false) {
+            return CallResultHelper::fail();
+        } else {
+            return CallResultHelper::success($result);
+        }
+    }
 }

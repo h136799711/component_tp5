@@ -64,19 +64,21 @@ class BaseConfigHelper
 
     /**
      * 初始化全局配置信息
+     * @param $projectId
      * @param int $cacheTime
      * @return array|bool|mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
-    static public function initGlobalConfig($cacheTime = 86400)
+    static public function initGlobalConfig($projectId, $cacheTime = 86400)
     {
         $config = Cache::get(self::GLOBAL_CONFIG_CACHE_NAME);
         if ($config === false) {
             $map = array();
             $fields = 'type,name,value';
             $api = new ConfigLogic();
+            $map['project_id'] = $projectId;
             $result = $api->queryNoPaging($map, false, $fields);
             $config = array();
 

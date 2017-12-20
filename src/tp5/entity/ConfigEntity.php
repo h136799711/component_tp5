@@ -21,6 +21,7 @@ use by\infrastructure\base\BaseEntity;
 
 class ConfigEntity extends BaseEntity
 {
+    private $projectId;
     private $name;
     private $type;
     private $title;
@@ -30,6 +31,22 @@ class ConfigEntity extends BaseEntity
     private $status;
     private $value;
     private $sort;
+
+    /**
+     * @return mixed
+     */
+    public function getProjectId()
+    {
+        return $this->projectId;
+    }
+
+    /**
+     * @param mixed $projectId
+     */
+    public function setProjectId($projectId)
+    {
+        $this->projectId = $projectId;
+    }
 
     /**
      * @return mixed

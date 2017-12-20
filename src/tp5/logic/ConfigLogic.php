@@ -23,17 +23,18 @@ class ConfigLogic extends BaseLogic
 {
     /**
      * 设置
+     * @param $projectId
      * @param $config
      * @return \by\infrastructure\base\CallResult
      */
-    public function set($config)
+    public function set($projectId, $config)
     {
         $effects = 0;
         $result = false;
         if ($config && is_array($config)) {
             $flag = true;
             foreach ($config as $name => $value) {
-                $map = array('name' => $name);
+                $map = array('name' => $name, 'project_id' => $projectId);
                 $result = $this->getModel()->where($map)->setField('value', $value);
                 if ($result !== false) {
                     $effects = $effects + $result;

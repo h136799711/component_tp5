@@ -75,7 +75,7 @@ class BaseConfigHelper
      */
     static public function initGlobalConfig($projectId, $cacheTime = 86400)
     {
-        $config = Cache::get(self::GLOBAL_CONFIG_CACHE_NAME);
+        $config = Cache::get(self::GLOBAL_CONFIG_CACHE_NAME . $projectId);
         if ($config === false) {
             $map = array();
             $fields = 'type,name,value';
@@ -93,7 +93,7 @@ class BaseConfigHelper
             }
 
             // 缓存配置$cacheTime秒
-            Cache::set(self::GLOBAL_CONFIG_CACHE_NAME, $config, $cacheTime);
+            Cache::set(self::GLOBAL_CONFIG_CACHE_NAME . $projectId, $config, $cacheTime);
         }
 
         return $config;

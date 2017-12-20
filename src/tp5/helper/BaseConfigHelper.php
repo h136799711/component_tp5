@@ -33,28 +33,30 @@ class BaseConfigHelper
 
     /**
      * 获取配置信息，不存在则返回false
+     * @param $projectId
      * @param $key
      * @return false
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    public static function getValue($key)
+    public static function getValue($projectId, $key)
     {
-        return self::getConfig($key);
+        return self::getConfig($projectId, $key);
     }
 
     /**
      * 读取配置值
+     * @param $projectId
      * @param $name
      * @return false 或 object
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    static public function getConfig($name)
+    static public function getConfig($projectId, $name)
     {
-        $config = self::initGlobalConfig();
+        $config = self::initGlobalConfig($projectId);
         if (isset($config[$name])) {
             return $config[$name];
         }
@@ -125,13 +127,14 @@ class BaseConfigHelper
     /**
      * 配置初始化
      *
+     * @param $projectId
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    public static function init()
+    public static function init($projectId)
     {
-        $config = self::initGlobalConfig();
+        $config = self::initGlobalConfig($projectId);
         foreach ($config as $key => $value) {
             Config::set($key, $value);
         }

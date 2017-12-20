@@ -89,8 +89,6 @@ abstract class BaseApiController extends Rest{
             $this->apiReturnErr(lang('lack_parameter', ['param' => 'client_id']));
         }
 
-        $this->allData->setLang($this->getLang());
-
         $data = Request::instance()->param();
         $data['client_id'] = $this->getClientId();
         $data['client_secret'] = $this->getClientSecret();

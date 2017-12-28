@@ -92,7 +92,7 @@ abstract class BaseLogic implements BaseLogicInterface
      * 禁用
      * 必须有status字段 ，0 为禁用状态
      * @param $map
-     * @return bool
+     * @return integer|false 更新条数
      */
     public function disable($map)
     {
@@ -103,7 +103,7 @@ abstract class BaseLogic implements BaseLogicInterface
      * 保存
      * @param $map
      * @param $entity
-     * @return string 错误信息或更新条数
+     * @return integer|false 更新条数
      */
     public function save($map, $entity)
     {
@@ -114,7 +114,7 @@ abstract class BaseLogic implements BaseLogicInterface
      * 启用
      * 必须有status字段，1 为启用状态
      * @param $map
-     * @return bool
+     * @return integer|false 更新条数
      */
     public function enable($map)
     {
@@ -125,7 +125,7 @@ abstract class BaseLogic implements BaseLogicInterface
      * 假删除
      * 必须有status字段，且 －1 为删除状态
      * @param $map
-     * @return bool
+     * @return integer|false 更新条数
      */
     public function pretendDelete($map)
     {
@@ -136,7 +136,7 @@ abstract class BaseLogic implements BaseLogicInterface
      * 根据id保存数据
      * @param $id
      * @param $entity
-     * @return array | bool
+     * @return integer|false 更新条数
      */
     public function saveByID($id, $entity)
     {

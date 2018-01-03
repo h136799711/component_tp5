@@ -68,9 +68,6 @@ abstract class BaseApiController extends Rest{
     abstract function getTransport();
 
     /**
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function readyRequiredParams()
     {

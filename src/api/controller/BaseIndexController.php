@@ -23,9 +23,9 @@ use by\infrastructure\base\CallResult;
 
 abstract class BaseIndexController extends BaseApiController
 {
-    private $domainName;
-    private $methodName;
-    private $domainObject;
+    protected $domainName;
+    protected $methodName;
+    protected $domainObject;
 
     /**
      * @return mixed

@@ -31,14 +31,25 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     protected $model;
 
-    public function __construct($initModel = true)
+    /**
+     * 类似如下使用方式:
+     * $logic1 = new BaseLogic(true, "db1");
+     * $logic2 = new BaseLogic(true, "db2");
+     * @param bool $initModel 是否初始化模型
+     * @param null $connection 传入数据库配置 这个会传给model使用
+     */
+    public function __construct($initModel = true, $connection = null)
     {
         if ($initModel) {
             $clsName = str_replace("Logic", "", get_class($this));
             $clsName = str_replace("logic", "model", $clsName);
             $clsName .= 'Model';
             if (class_exists($clsName)) {
-                $this->model = new $clsName;
+                if (!empty($connection)) {
+                    $this->model = new $clsName([], $connection);
+                } else {
+                    $this->model = new $clsName;
+                }
             }
         }
     }

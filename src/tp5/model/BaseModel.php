@@ -38,4 +38,17 @@ abstract class BaseModel extends Model
         }
         return $entity;
     }
+
+    /**
+     * 增加传入数据库链接
+     * @param array $data
+     * @param null $connection
+     */
+    public function __construct($data = [], $connection = null)
+    {
+        parent::__construct($data);
+        if (!empty($connection)) {
+            $this->connection = $connection;
+        }
+    }
 }

@@ -76,7 +76,7 @@ class BaseConfigHelper
     static public function initGlobalConfig($projectId, $cacheTime = 86400)
     {
         $config = Cache::get(self::GLOBAL_CONFIG_CACHE_NAME . $projectId);
-        if ($config === false) {
+        if (empty($config)) {
             $map = array();
             $fields = 'type,name,value';
             $api = new ConfigLogic();

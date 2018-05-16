@@ -17,7 +17,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "by\\component\\": "src/"
+      "by\\component\\": "src/",
+      "byTest\\component\\": "tests/"
     }
   },
   "repositories": {
@@ -28,10 +29,10 @@
   },
   "require": {
     "php": ">=5.6",
-    "topthink/framework": "5.1.5",
+    "topthink/framework": "5.1.13",
     "itboye/architecture": "1.0.20180329"
   },
   "require-dev": {
-    "topthink/think-testing": "dev-master"
+    "phpunit/phpunit": "6.5.x-dev"
   }
 }

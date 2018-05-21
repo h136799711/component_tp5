@@ -10,8 +10,8 @@ namespace by\component\tp5\helper;
 
 use by\component\tp5\entity\ConfigEntity;
 use by\component\tp5\logic\ConfigLogic;
-use think\Cache;
-use think\Config;
+use think\facade\Cache;
+use think\facade\Config;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\exception\DbException;

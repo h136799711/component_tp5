@@ -18,7 +18,7 @@ namespace by\component\tp5\helper;
 
 
 use by\infrastructure\helper\CallResultHelper;
-use think\Request;
+use think\facade\Request;
 
 class RequestHelper
 {

@@ -21,7 +21,8 @@ use by\component\paging\vo\PagingParams;
 use by\component\tp5\helper\RequestHelper;
 use by\infrastructure\helper\Object2DataArrayHelper;
 use think\Controller;
-use think\Request;
+use think\facade\Env;
+use think\facade\Request;
 
 /**
  * Class BaseController
@@ -61,6 +62,6 @@ class BaseController extends Controller
 
     public function _empty()
     {
-        return $this->fetch(APP_PATH . 'html/404/web/index.html');
+        return $this->fetch(Env::get('app_path') . 'html/404/web/index.html');
     }
 }

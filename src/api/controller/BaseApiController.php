@@ -11,8 +11,9 @@ namespace by\component\api\controller;
 use by\component\api\entity\ApiCommonEntity;
 use by\component\encrypt\interfaces\TransportInterface;
 use by\infrastructure\base\CallResult;
-use think\controller\Rest;
-use think\Request;
+
+use think\Controller;
+use think\facade\Request;
 
 
 /**
@@ -22,7 +23,7 @@ use think\Request;
  * @author 老胖子-何必都 <hebiduhebi@126.com>
  * @package by\component\Controller
  */
-abstract class BaseApiController extends Rest{
+abstract class BaseApiController extends Controller {
 
     /**
      * 所有请求的数据

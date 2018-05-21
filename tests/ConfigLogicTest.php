@@ -43,10 +43,10 @@ class ConfigLogicTest extends \PHPUnit\Framework\TestCase
      */
     public function testQuery()
     {
-        $logic = new ConfigLogic(false, $this->connection);
+        $logic = new ConfigLogic(true, $this->connection);
         $map = [];
         $page = new PagingParams(0, 10);
-        $result = $logic->query($map);
+        $result = $logic->query($map, $page);
         $count = $result['count'];
         var_dump($result);
         Assert::assertEquals(1, $count);

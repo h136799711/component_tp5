@@ -50,7 +50,7 @@ class BaseController extends Controller
     public function param($key = '', $default = '', $emptyErrMsg = '')
     {
         if ($key === '') {
-            return Request::instance()->param();
+            return Request::param();
         }
 
         $callResult = RequestHelper::param($key, $default, $emptyErrMsg);

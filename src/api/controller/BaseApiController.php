@@ -73,8 +73,8 @@ abstract class BaseApiController extends Controller {
     public function readyRequiredParams()
     {
         // 1. 请求客服端版本、类型信息
-        $this->allData->setAppType(Request::instance()->param("app_type", ""));
-        $this->allData->setAppVersion(Request::instance()->param("app_version", ""));
+        $this->allData->setAppType(Request::param("app_type", ""));
+        $this->allData->setAppVersion(Request::param("app_version", ""));
         if (empty($this->allData->getAppType())) {
             $this->apiReturnErr(lang('lack_parameter', ['param' => 'app_type']));
         }
@@ -87,7 +87,7 @@ abstract class BaseApiController extends Controller {
             $this->apiReturnErr(lang('lack_parameter', ['param' => 'client_id']));
         }
 
-        $data = Request::instance()->param();
+        $data = Request::param();
         $data['client_id'] = $this->getClientId();
         $data['client_secret'] = $this->getClientSecret();
         $this->allData->setData($data);
@@ -137,9 +137,9 @@ abstract class BaseApiController extends Controller {
     }
 
     public function _param($key, $default='',$emptyErrMsg=''){
-        $value = Request::instance()->post($key,$default);
+        $value = Request::post($key,$default);
         if($value == $default || empty($value)){
-            $value =  Request::instance()->get($key,$default);
+            $value =  Request::get($key,$default);
         }
 
         if($default == $value && !empty($emptyErrMsg)){
@@ -194,7 +194,7 @@ abstract class BaseApiController extends Controller {
      */
     public function _post($key,$default='',$emptyErrMsg=''){
 
-        $value = Request::instance()->post($key,$default);
+        $value = Request::post($key,$default);
 
         if($default == $value && !empty($emptyErrMsg)){
             $this->apiReturnErr($emptyErrMsg);
@@ -226,7 +226,7 @@ abstract class BaseApiController extends Controller {
      * @return mixed
      */
     public function _get($key,$default='',$emptyErrMsg=''){
-        $value = Request::instance()->get($key,$default);
+        $value = Request::get($key,$default);
 
         if($default == $value && !empty($emptyErrMsg)){
             $this->apiReturnErr($emptyErrMsg);
@@ -243,7 +243,7 @@ abstract class BaseApiController extends Controller {
      */
     public function _header($key,$default='',$emptyErrMsg = ''){
 
-        $value = Request::instance()->header($key);
+        $value = Request::header($key);
 
         if($default == $value && !empty($emptyErrMsg)){
             $this->apiReturnErr($emptyErrMsg);

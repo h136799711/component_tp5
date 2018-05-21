@@ -171,14 +171,18 @@ abstract class BaseApiController extends Controller {
             $data = $this->transport->encrypt($data);
         }
 
-        $response = $this->response($data, "json",200);
+
         $siteUrl = config('site_url');
         if (empty($siteUrl)) {
             $siteUrl = "www.itboye.com";
         }
         $notify_id = $this->allData->getNotifyId();
         $notify_id = $notify_id ? $notify_id : time();
-        $response->header("X-Powered-By", $siteUrl)->header("X-BY-Notify-ID", $notify_id)->send();
+        $header = [
+            'X-Powered-By'=>$siteUrl,
+            "X-BY-Notify-ID"=>$notify_id
+        ];
+        response($data, 200, $header, "json")->send();
         exit(0);
     }
 

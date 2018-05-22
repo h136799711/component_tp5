@@ -49,16 +49,23 @@ class ConfigLogicTest extends TestCase
      */
     public function testQuery()
     {
-        Loader::register();
-        $logic = new ConfigLogic(true, $this->connection);
-        $map[] = ['type', '=', 1];
-        $page = new PagingParams(0, 10);
-        $result = $logic->query($map, $page);
-        $count = $result['count'];
-        var_dump($result);
-        Assert::assertEquals(1, $count);
-        $map[] = ['type', '=', 1];
-        $result = $logic->sum($map, $page);
-        var_dump($result);
+
+        $order = " id ,  create_time     desc ";
+        $tmp = explode(",", $order);
+        $newOrder = [];
+        foreach ($tmp as $val) {
+            $one = $this->parseOneOrder($val);
+            array_push($newOrder, $one);
+        }
+        return $newOrder;
+    }
+
+    private function parseOneOrder($order)
+    {
+        $order = preg_split("/\s+/", trim($order));
+        if (count($order) == 2 && ($order[1] == 'desc' || $order[1] == 'asc')) {
+            return [$order[0]=>$order[1]];
+        }
+        return $order[0];
     }
 }

@@ -239,6 +239,7 @@ abstract class BaseLogic implements BaseLogicInterface
         $query = $this->model;
 
         if (false !== $order) {
+            $order = $this->parseOrder($order);
             $query = $query->order($order);
         }
 
@@ -332,6 +333,7 @@ abstract class BaseLogic implements BaseLogicInterface
     public function queryNoPaging($map = null, $order = false, $fields = false)
     {
         $map = $this->preProcessMapFroTp5Dot1($map);
+        $order = $this->parseOrder($order);
         $query = $this->model;
         if (!empty($map)) $query = $query->where($map);
         if (false !== $order) $query = $query->order($order);
@@ -362,6 +364,7 @@ abstract class BaseLogic implements BaseLogicInterface
     {
         $query = $this->getModel();
         $map = $this->preProcessMapFroTp5Dot1($map);
+        $order = $this->parseOrder($order);
         if (!is_null($map)) $query = $query->where($map);
         if (false !== $order) $query = $query->order($order);
         if (false !== $fields) $query = $query->field($fields);
@@ -394,6 +397,7 @@ abstract class BaseLogic implements BaseLogicInterface
     {
         $query = $this->model;
         $map = $this->preProcessMapFroTp5Dot1($map);
+        $order = $this->parseOrder($order);
         if (!is_null($map)) $query = $query->where($map);
         if (false !== $order) $query = $query->order($order);
         if (false !== $fields) $query = $query->field($fields);
@@ -404,6 +408,28 @@ abstract class BaseLogic implements BaseLogicInterface
         ];
         $list = $query->paginate($config);
         return $list;
+    }
+
+    public function parseOrder($order)
+    {
+        if (empty($order)) return $order;
+        if (is_array($order)) return $order;
+        $tmp = explode(",", $order);
+        $newOrder = [];
+        foreach ($tmp as $val) {
+            $one = $this->parseOneOrder($val);
+            array_push($newOrder, $one);
+        }
+        return $newOrder;
+    }
+
+    private function parseOneOrder($one)
+    {
+        $one = preg_split("/\s+/", trim($one));
+        if (count($one) == 2 && ($one[1] == 'desc' || $one[1] == 'asc')) {
+            return [$one[0]=>$one[1]];
+        }
+        return $one[0];
     }
 
     /**

@@ -6,4 +6,6 @@
 [![Daily Downloads](https://poser.pugx.org/itboye/component_tp5/d/daily)](https://packagist.org/packages/itboye/component_tp5)
 [![License](https://poser.pugx.org/itboye/component_tp5/license)](https://packagist.org/packages/itboye/component_tp5)
 
-1. TODO 增加说明
+## 历史记录
+
+1. 【20180522】 增加了security_code 组件 

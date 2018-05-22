@@ -417,7 +417,7 @@ abstract class BaseLogic implements BaseLogicInterface
         $newMap = [];
         foreach ($map as $key => $value) {
             if (is_int($key)) {
-                $map[] = $value;
+                $newMap[] = $value;
                 continue;
             }
             if (is_array($value)) {

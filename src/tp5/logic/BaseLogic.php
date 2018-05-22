@@ -423,7 +423,7 @@ abstract class BaseLogic implements BaseLogicInterface
         $newOrder = [];
         foreach ($tmp as $val) {
             $one = $this->parseOneOrder($val);
-            array_push($newOrder, $one);
+            $newOrder = array_merge($newOrder, $one);
         }
         return $newOrder;
     }

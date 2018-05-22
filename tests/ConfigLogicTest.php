@@ -12,8 +12,14 @@ namespace tests;
 use by\component\paging\vo\PagingParams;
 use by\component\tp5\logic\ConfigLogic;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
+use think\Loader;
 
-class ConfigLogicTest extends \PHPUnit\Framework\TestCase
+
+// 载入Loader类
+require __DIR__ . '/../vendor/topthink/framework/library/think/Loader.php';
+
+class ConfigLogicTest extends TestCase
 {
     protected $connection = [
         // 数据库类型
@@ -21,7 +27,7 @@ class ConfigLogicTest extends \PHPUnit\Framework\TestCase
         // 服务器地址
         'hostname'    => '127.0.0.1',
         // 数据库名
-        'database'    => 'phpunit',
+        'database'    => 'itboye_tbk',
         // 数据库用户名
         'username'    => 'root',
         // 数据库密码
@@ -43,12 +49,16 @@ class ConfigLogicTest extends \PHPUnit\Framework\TestCase
      */
     public function testQuery()
     {
+        Loader::register();
         $logic = new ConfigLogic(true, $this->connection);
-        $map = [];
+        $map[] = ['type', '=', 1];
         $page = new PagingParams(0, 10);
         $result = $logic->query($map, $page);
         $count = $result['count'];
         var_dump($result);
         Assert::assertEquals(1, $count);
+        $map[] = ['type', '=', 1];
+        $result = $logic->sum($map, $page);
+        var_dump($result);
     }
 }

@@ -62,6 +62,7 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     public function sum($map, $field)
     {
+        $map = $this->preProcessMapFroTp5Dot1($map);
         return $this->getModel()->where($map)->sum($field);
     }
 
@@ -91,6 +92,7 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     public function count($map, $field = false)
     {
+        $map = $this->preProcessMapFroTp5Dot1($map);
         if ($field === false) {
             $result = $this->model->where($map)->count();
         } else {
@@ -118,6 +120,7 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     public function save($map, $entity)
     {
+        $map = $this->preProcessMapFroTp5Dot1($map);
         return $this->getModel()->save($entity, $map);
     }
 
@@ -166,7 +169,7 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     public function setInc($map, $field, $cnt = 1)
     {
-
+        $map = $this->preProcessMapFroTp5Dot1($map);
         return $this->model->where($map)->setInc($field, $cnt);
     }
 
@@ -183,6 +186,7 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     public function setDecCantZero($map, $field, $cnt = 1)
     {
+        $map = $this->preProcessMapFroTp5Dot1($map);
         $result = $this->model->where($map)->find()->toArray();
 
         if (!empty($result) && isset($result[$field])) {
@@ -204,6 +208,7 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     public function setDec($map, $field, $cnt = 1)
     {
+        $map = $this->preProcessMapFroTp5Dot1($map);
         return $this->model->where($map)->setDec($field, $cnt);
     }
 
@@ -230,6 +235,7 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     public function getInfo($map, $order = false, $field = false)
     {
+        $map = $this->preProcessMapFroTp5Dot1($map);
         $query = $this->model;
 
         if (false !== $order) {
@@ -257,6 +263,7 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     public function delete($map)
     {
+        $map = $this->preProcessMapFroTp5Dot1($map);
         return $this->model->where($map)->delete();
     }
 
@@ -324,6 +331,7 @@ abstract class BaseLogic implements BaseLogicInterface
      */
     public function queryNoPaging($map = null, $order = false, $fields = false)
     {
+        $map = $this->preProcessMapFroTp5Dot1($map);
         $query = $this->model;
         if (!empty($map)) $query = $query->where($map);
         if (false !== $order) $query = $query->order($order);
@@ -353,6 +361,7 @@ abstract class BaseLogic implements BaseLogicInterface
     public function query($map, PagingParams $page, $order = false, $fields = false)
     {
         $query = $this->getModel();
+        $map = $this->preProcessMapFroTp5Dot1($map);
         if (!is_null($map)) $query = $query->where($map);
         if (false !== $order) $query = $query->order($order);
         if (false !== $fields) $query = $query->field($fields);
@@ -384,6 +393,7 @@ abstract class BaseLogic implements BaseLogicInterface
     public function queryWithPagingHtml($map, PagingParams $page, $order = false, $params = [], $fields = false)
     {
         $query = $this->model;
+        $map = $this->preProcessMapFroTp5Dot1($map);
         if (!is_null($map)) $query = $query->where($map);
         if (false !== $order) $query = $query->order($order);
         if (false !== $fields) $query = $query->field($fields);
@@ -394,5 +404,29 @@ abstract class BaseLogic implements BaseLogicInterface
         ];
         $list = $query->paginate($config);
         return $list;
+    }
+
+    /**
+     * 以下针对升级到tp5.1 的处理
+     * @param $map
+     * @return array
+     */
+    public function preProcessMapFroTp5Dot1($map)
+    {
+
+        $newMap = [];
+        foreach ($map as $key => $value) {
+            if (is_int($key)) {
+                $map[] = $value;
+                continue;
+            }
+            if (is_array($value)) {
+                array_unshift($value, $key);
+                $newMap[] = $value;
+            } else {
+                $newMap[] = [$key, '=', $value];
+            }
+        }
+        return $newMap;
     }
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="tests" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.015115">
+    <testsuite name="tests\ConfigLogicTest" file="/Users/git/component_tp5/tests/ConfigLogicTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.015115">
+      <testcase name="testQuery" class="tests\ConfigLogicTest" classname="tests.ConfigLogicTest" file="/Users/git/component_tp5/tests/ConfigLogicTest.php" line="50" assertions="0" time="0.015115">
+        <error type="think\exception\ClassNotFoundException">tests\ConfigLogicTest::testQuery
+think\exception\ClassNotFoundException: class not exists: config
+
+/Users/git/component_tp5/vendor/topthink/framework/library/think/Container.php:354
+/Users/git/component_tp5/vendor/topthink/framework/library/think/Container.php:206
+/Users/git/component_tp5/vendor/topthink/framework/library/think/Container.php:72
+/Users/git/component_tp5/vendor/topthink/framework/library/think/Model.php:144
+/Users/git/component_tp5/src/tp5/model/BaseModel.php:49
+/Users/git/component_tp5/src/tp5/logic/BaseLogic.php:49
+/Users/git/component_tp5/tests/ConfigLogicTest.php:53
+</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -410,6 +410,11 @@ abstract class BaseLogic implements BaseLogicInterface
         return $list;
     }
 
+    /**
+     * 针对5.0的字符串排序方式兼容5.1 的升级辅助方法
+     * @param $order
+     * @return array
+     */
     public function parseOrder($order)
     {
         if (empty($order)) return $order;
@@ -433,7 +438,8 @@ abstract class BaseLogic implements BaseLogicInterface
     }
 
     /**
-     * 以下针对升级到tp5.1 的处理
+     * 针对5.0的字符串查询方式兼容5.1的升级辅助方法
+     * 全部转成索引数组方式
      * @param $map
      * @return array
      */

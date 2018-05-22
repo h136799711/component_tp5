@@ -459,6 +459,6 @@ abstract class BaseLogic implements BaseLogicInterface
                 $newMap[] = [$key, '=', $value];
             }
         }
-        return [$newMap];
+        return $newMap;
     }
 }

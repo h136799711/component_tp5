@@ -7,11 +7,15 @@
 [![License](https://poser.pugx.org/itboye/component_tp5/license)](https://packagist.org/packages/itboye/component_tp5)
 
 ## 历史记录
-v1.1.20180607 
+
+####v1.1.20180629
+1. 支持tp5.1.17
+
+####v1.1.20180607 
 
 1. 优化
 
-v1.1.20180522
+####v1.1.20180522
 1. 【20180522】 增加了security_code 组件 
 2. 支持tp5.1.14
 

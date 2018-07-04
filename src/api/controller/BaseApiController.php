@@ -102,6 +102,9 @@ abstract class BaseApiController extends Controller {
     {
 
         $this->transport = $this->getTransport();
+        if (!($this->transport  instanceof TransportInterface)) {
+            $this->apiReturnErr(lang('invalid client_id'));
+        }
 
         // 4. 解密数据并转换成 ApiCommonEntity
         $requestParams = $this->transport->decrypt($this->allData->getData());

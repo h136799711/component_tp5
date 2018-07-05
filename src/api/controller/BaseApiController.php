@@ -73,19 +73,18 @@ abstract class BaseApiController extends Controller {
     public function readyRequiredParams()
     {
         // 1. 请求客服端版本、类型信息
-        $this->allData->setAppType(Request::param("app_type", ""));
-        $this->allData->setAppVersion(Request::param("app_version", ""));
-        if (empty($this->allData->getAppType())) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'app_type']));
-        }
-        if (empty($this->allData->getAppVersion())) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'app_version']));
-        }
-
-        $this->allData->setClientId($this->_param("client_id", "", lang('lack_parameter', ['param' => 'client_id'])));
-        if (empty($this->getClientId())) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'client_id']));
-        }
+        $appType = $this->_param("app_type", "", lang('lack_parameter', ['param' => 'app_type']));
+        $appVersion = $this->_param("app_version", "", lang('lack_parameter', ['param' => 'app_version']));
+        $clientId = $this->_param("client_id", "", lang('lack_parameter', ['param' => 'client_id']));
+        $serviceType = $this->_param("service_type", "", lang('lack_parameter', ['param' => 'service_type']));
+        // 2. 以下参数必须传
+        $this->allData->setAppType($appType);
+        $this->allData->setAppVersion($appVersion);
+        $this->allData->setClientId($clientId);
+        $this->allData->setServiceType($serviceType);
+        // 2. 可以为空
+        $this->allData->setServiceVersion(Request::param('service_version', 100));
+        $this->allData->setNotifyId(Request::param('notify_id', '0'));
 
         $data = Request::param();
         $data['client_id'] = $this->getClientId();
@@ -108,19 +107,6 @@ abstract class BaseApiController extends Controller {
 
         // 4. 解密数据并转换成 ApiCommonEntity
         $requestParams = $this->transport->decrypt($this->allData->getData());
-        if (!array_key_exists('by_api_ver', $requestParams)) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_api_ver']));
-        }
-
-        if (!array_key_exists('by_type', $requestParams)) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_type']));
-        }
-        if (!array_key_exists('by_notify_id', $requestParams)) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_notify_id']));
-        }
-        if (!array_key_exists('by_time', $requestParams)) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_time']));
-        }
 
         // 5. 先初始化
         $this->allData->setData([]);
@@ -128,14 +114,6 @@ abstract class BaseApiController extends Controller {
         $this->allData->setClientSecret($this->getClientSecret());
         $this->allData->setProjectId($this->getProjectId());
         $this->allData->setLang($this->getLang());
-        $this->allData->setAppRequestTime($requestParams['by_time']);
-        $this->allData->setNotifyId($requestParams['by_notify_id']);
-        $this->allData->setServiceVersion($requestParams['by_api_ver']);
-        $this->allData->setServiceType($requestParams['by_type']);
-        unset($requestParams['by_time']);
-        unset($requestParams['by_notify_id']);
-        unset($requestParams['by_api_ver']);
-        unset($requestParams['by_type']);
         $this->allData->setData($requestParams);
     }
 

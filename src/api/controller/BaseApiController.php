@@ -48,6 +48,7 @@ abstract class BaseApiController extends Controller {
     }
 
     /**
+     * 获取语言
      * @return string
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -55,17 +56,37 @@ abstract class BaseApiController extends Controller {
      */
     abstract function getLang();
 
+    /**
+     * 返回项目的标记
+     * @return string
+     */
     abstract function getProjectId();
 
+    /**
+     * 返回ClientId
+     * @return string
+     */
     public function getClientId()
     {
         return $this->allData->getClientId();
     }
 
+    /**
+     * 返回clientId对应的ClientSecret
+     * @return string
+     */
     abstract function getClientSecret();
 
+    /**
+     * 获取的是ClientId对应的传输算法
+     * @return string
+     */
     abstract function getApiAlg();
 
+    /**
+     * 返回传输算法对象
+     * @return TransportInterface
+     */
     abstract function getTransport();
 
     /**
@@ -93,6 +114,7 @@ abstract class BaseApiController extends Controller {
     }
 
     /**
+     * 准备好所有数据
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException

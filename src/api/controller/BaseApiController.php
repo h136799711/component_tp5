@@ -23,7 +23,8 @@ use think\facade\Request;
  * @author 老胖子-何必都 <hebiduhebi@126.com>
  * @package by\component\Controller
  */
-abstract class BaseApiController extends Controller {
+abstract class BaseApiController extends Controller
+{
 
     /**
      * 所有请求的数据
@@ -42,7 +43,8 @@ abstract class BaseApiController extends Controller {
     /**
      * Base constructor.
      */
-    public function __construct(){
+    public function __construct()
+    {
         $this->allData = new ApiCommonEntity();
         parent::__construct();
     }
@@ -123,7 +125,7 @@ abstract class BaseApiController extends Controller {
     {
 
         $this->transport = $this->getTransport();
-        if (!($this->transport  instanceof TransportInterface)) {
+        if (!($this->transport instanceof TransportInterface)) {
             $this->apiReturnErr(lang('invalid client_id'));
         }
 
@@ -139,13 +141,14 @@ abstract class BaseApiController extends Controller {
         $this->allData->setData($requestParams);
     }
 
-    public function _param($key, $default='',$emptyErrMsg=''){
-        $value = Request::post($key,$default);
-        if($value == $default || empty($value)){
-            $value =  Request::get($key,$default);
+    public function _param($key, $default = '', $emptyErrMsg = '')
+    {
+        $value = Request::post($key, $default);
+        if ($value == $default || empty($value)) {
+            $value = Request::get($key, $default);
         }
 
-        if($default == $value && !empty($emptyErrMsg)){
+        if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
         }
         return $value;
@@ -160,7 +163,7 @@ abstract class BaseApiController extends Controller {
             $obj = $obj->getMsg();
         }
 
-        $this->ajaxReturn(['msg'=>$obj, 'code'=>$code,'data'=>$data,'notify_id'=>$this->allData->getNotifyId()]);
+        $this->ajaxReturn(['msg' => $obj, 'code' => $code, 'data' => $data, 'notify_id' => $this->allData->getNotifyId()]);
     }
 
 
@@ -168,9 +171,10 @@ abstract class BaseApiController extends Controller {
      * 返回数据
      * @param $data
      */
-    protected function ajaxReturn($data) {
+    protected function ajaxReturn($data)
+    {
 
-        if($this->transport instanceof TransportInterface){
+        if ($this->transport instanceof TransportInterface) {
             $data = $this->transport->encrypt($data);
         }
 
@@ -182,8 +186,8 @@ abstract class BaseApiController extends Controller {
         $notify_id = $this->allData->getNotifyId();
         $notify_id = $notify_id ? $notify_id : time();
         $header = [
-            'X-Powered-By'=>$siteUrl,
-            "X-BY-Notify-ID"=>$notify_id
+            'X-Powered-By' => $siteUrl,
+            "X-BY-Notify-ID" => $notify_id
         ];
         response($data, 200, $header, "json")->send();
         exit(0);
@@ -192,14 +196,15 @@ abstract class BaseApiController extends Controller {
     /**
      * @param $key
      * @param string $default
-     * @param string $emptyErrMsg  为空时的报错
+     * @param string $emptyErrMsg 为空时的报错
      * @return mixed
      */
-    public function _post($key,$default='',$emptyErrMsg=''){
+    public function _post($key, $default = '', $emptyErrMsg = '')
+    {
 
-        $value = Request::post($key,$default);
+        $value = Request::post($key, $default);
 
-        if($default == $value && !empty($emptyErrMsg)){
+        if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
         }
         return $value;
@@ -210,12 +215,13 @@ abstract class BaseApiController extends Controller {
      * @param $post
      * @return string
      */
-    protected function filter_post($post){
+    protected function filter_post($post)
+    {
         $post = trim($post);
-        for ($i=strlen($post)-1;$i>=0;$i--) {
+        for ($i = strlen($post) - 1; $i >= 0; $i--) {
             $ord = ord($post[$i]);
-            if($ord > 31 && $ord != 127){
-                $post = substr($post,0,$i+1);
+            if ($ord > 31 && $ord != 127) {
+                $post = substr($post, 0, $i + 1);
                 return $post;
             }
         }
@@ -225,13 +231,14 @@ abstract class BaseApiController extends Controller {
     /**
      * @param $key
      * @param string $default
-     * @param string $emptyErrMsg  为空时的报错
+     * @param string $emptyErrMsg 为空时的报错
      * @return mixed
      */
-    public function _get($key,$default='',$emptyErrMsg=''){
-        $value = Request::get($key,$default);
+    public function _get($key, $default = '', $emptyErrMsg = '')
+    {
+        $value = Request::get($key, $default);
 
-        if($default == $value && !empty($emptyErrMsg)){
+        if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
         }
         return $value;
@@ -244,17 +251,19 @@ abstract class BaseApiController extends Controller {
      * @param string $emptyErrMsg
      * @return string
      */
-    public function _header($key,$default='',$emptyErrMsg = ''){
+    public function _header($key, $default = '', $emptyErrMsg = '')
+    {
 
         $value = Request::header($key);
 
-        if($default == $value && !empty($emptyErrMsg)){
+        if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
         }
         return $value;
     }
 
-    protected function apiReturnSuc($data){
+    protected function apiReturnSuc($data)
+    {
         $msg = 'success';
         $code = 0;
         if ($data instanceof CallResult) {
@@ -263,7 +272,7 @@ abstract class BaseApiController extends Controller {
             $data = $data->getData();
         }
 
-        $this->ajaxReturn(['code'=>$code, 'data'=>$data, 'msg'=>$msg, 'notify_id'=>$this->allData->getNotifyId()]);
+        $this->ajaxReturn(['code' => $code, 'data' => $data, 'msg' => $msg, 'notify_id' => $this->allData->getNotifyId()]);
     }
 
 }

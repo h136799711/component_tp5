@@ -11,8 +11,9 @@ namespace by\component\api\controller;
 use by\component\api\entity\ApiCommonEntity;
 use by\component\encrypt\interfaces\TransportInterface;
 use by\infrastructure\base\CallResult;
-use think\controller\Rest;
-use think\Request;
+
+use think\Controller;
+use think\facade\Request;
 
 
 /**
@@ -22,7 +23,8 @@ use think\Request;
  * @author 老胖子-何必都 <hebiduhebi@126.com>
  * @package by\component\Controller
  */
-abstract class BaseApiController extends Rest{
+abstract class BaseApiController extends Controller
+{
 
     /**
      * 所有请求的数据
@@ -41,12 +43,14 @@ abstract class BaseApiController extends Rest{
     /**
      * Base constructor.
      */
-    public function __construct(){
+    public function __construct()
+    {
         $this->allData = new ApiCommonEntity();
         parent::__construct();
     }
 
     /**
+     * 获取语言
      * @return string
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -54,17 +58,37 @@ abstract class BaseApiController extends Rest{
      */
     abstract function getLang();
 
+    /**
+     * 返回项目的标记
+     * @return string
+     */
     abstract function getProjectId();
 
+    /**
+     * 返回ClientId
+     * @return string
+     */
     public function getClientId()
     {
         return $this->allData->getClientId();
     }
 
+    /**
+     * 返回clientId对应的ClientSecret
+     * @return string
+     */
     abstract function getClientSecret();
 
+    /**
+     * 获取的是ClientId对应的传输算法
+     * @return string
+     */
     abstract function getApiAlg();
 
+    /**
+     * 返回传输算法对象
+     * @return TransportInterface
+     */
     abstract function getTransport();
 
     /**
@@ -72,27 +96,27 @@ abstract class BaseApiController extends Rest{
     public function readyRequiredParams()
     {
         // 1. 请求客服端版本、类型信息
-        $this->allData->setAppType(Request::instance()->param("app_type", ""));
-        $this->allData->setAppVersion(Request::instance()->param("app_version", ""));
-        if (empty($this->allData->getAppType())) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'app_type']));
-        }
-        if (empty($this->allData->getAppVersion())) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'app_version']));
-        }
+        $appType = $this->_param("app_type", "", lang('lack_parameter', ['param' => 'app_type']));
+        $appVersion = $this->_param("app_version", "", lang('lack_parameter', ['param' => 'app_version']));
+        $clientId = $this->_param("client_id", "", lang('lack_parameter', ['param' => 'client_id']));
+        $serviceType = $this->_param("service_type", "", lang('lack_parameter', ['param' => 'service_type']));
+        // 2. 以下参数必须传
+        $this->allData->setAppType($appType);
+        $this->allData->setAppVersion($appVersion);
+        $this->allData->setClientId($clientId);
+        $this->allData->setServiceType($serviceType);
+        // 2. 可以为空
+        $this->allData->setServiceVersion(Request::param('service_version', 100));
+        $this->allData->setNotifyId(Request::param('notify_id', '0'));
 
-        $this->allData->setClientId($this->_param("client_id", "", lang('lack_parameter', ['param' => 'client_id'])));
-        if (empty($this->getClientId())) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'client_id']));
-        }
-
-        $data = Request::instance()->param();
+        $data = Request::param();
         $data['client_id'] = $this->getClientId();
         $data['client_secret'] = $this->getClientSecret();
         $this->allData->setData($data);
     }
 
     /**
+     * 准备好所有数据
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -101,22 +125,12 @@ abstract class BaseApiController extends Rest{
     {
 
         $this->transport = $this->getTransport();
+        if (!($this->transport instanceof TransportInterface)) {
+            $this->apiReturnErr(lang('invalid client_id'));
+        }
 
         // 4. 解密数据并转换成 ApiCommonEntity
         $requestParams = $this->transport->decrypt($this->allData->getData());
-        if (!array_key_exists('by_api_ver', $requestParams)) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_api_ver']));
-        }
-
-        if (!array_key_exists('by_type', $requestParams)) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_type']));
-        }
-        if (!array_key_exists('by_notify_id', $requestParams)) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_notify_id']));
-        }
-        if (!array_key_exists('by_time', $requestParams)) {
-            $this->apiReturnErr(lang('lack_parameter', ['param' => 'by_time']));
-        }
 
         // 5. 先初始化
         $this->allData->setData([]);
@@ -124,24 +138,17 @@ abstract class BaseApiController extends Rest{
         $this->allData->setClientSecret($this->getClientSecret());
         $this->allData->setProjectId($this->getProjectId());
         $this->allData->setLang($this->getLang());
-        $this->allData->setAppRequestTime($requestParams['by_time']);
-        $this->allData->setNotifyId($requestParams['by_notify_id']);
-        $this->allData->setServiceVersion($requestParams['by_api_ver']);
-        $this->allData->setServiceType($requestParams['by_type']);
-        unset($requestParams['by_time']);
-        unset($requestParams['by_notify_id']);
-        unset($requestParams['by_api_ver']);
-        unset($requestParams['by_type']);
         $this->allData->setData($requestParams);
     }
 
-    public function _param($key, $default='',$emptyErrMsg=''){
-        $value = Request::instance()->post($key,$default);
-        if($value == $default || empty($value)){
-            $value =  Request::instance()->get($key,$default);
+    public function _param($key, $default = '', $emptyErrMsg = '')
+    {
+        $value = Request::post($key, $default);
+        if ($value == $default || empty($value)) {
+            $value = Request::get($key, $default);
         }
 
-        if($default == $value && !empty($emptyErrMsg)){
+        if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
         }
         return $value;
@@ -156,7 +163,7 @@ abstract class BaseApiController extends Rest{
             $obj = $obj->getMsg();
         }
 
-        $this->ajaxReturn(['msg'=>$obj, 'code'=>$code,'data'=>$data,'notify_id'=>$this->allData->getNotifyId()]);
+        $this->ajaxReturn(['msg' => $obj, 'code' => $code, 'data' => $data, 'notify_id' => $this->allData->getNotifyId()]);
     }
 
 
@@ -164,34 +171,40 @@ abstract class BaseApiController extends Rest{
      * 返回数据
      * @param $data
      */
-    protected function ajaxReturn($data) {
+    protected function ajaxReturn($data)
+    {
 
-        if($this->transport instanceof TransportInterface){
+        if ($this->transport instanceof TransportInterface) {
             $data = $this->transport->encrypt($data);
         }
 
-        $response = $this->response($data, "json",200);
+
         $siteUrl = config('site_url');
         if (empty($siteUrl)) {
             $siteUrl = "www.itboye.com";
         }
         $notify_id = $this->allData->getNotifyId();
         $notify_id = $notify_id ? $notify_id : time();
-        $response->header("X-Powered-By", $siteUrl)->header("X-BY-Notify-ID", $notify_id)->send();
+        $header = [
+            'X-Powered-By' => $siteUrl,
+            "X-BY-Notify-ID" => $notify_id
+        ];
+        response($data, 200, $header, "json")->send();
         exit(0);
     }
 
     /**
      * @param $key
      * @param string $default
-     * @param string $emptyErrMsg  为空时的报错
+     * @param string $emptyErrMsg 为空时的报错
      * @return mixed
      */
-    public function _post($key,$default='',$emptyErrMsg=''){
+    public function _post($key, $default = '', $emptyErrMsg = '')
+    {
 
-        $value = Request::instance()->post($key,$default);
+        $value = Request::post($key, $default);
 
-        if($default == $value && !empty($emptyErrMsg)){
+        if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
         }
         return $value;
@@ -202,12 +215,13 @@ abstract class BaseApiController extends Rest{
      * @param $post
      * @return string
      */
-    protected function filter_post($post){
+    protected function filter_post($post)
+    {
         $post = trim($post);
-        for ($i=strlen($post)-1;$i>=0;$i--) {
+        for ($i = strlen($post) - 1; $i >= 0; $i--) {
             $ord = ord($post[$i]);
-            if($ord > 31 && $ord != 127){
-                $post = substr($post,0,$i+1);
+            if ($ord > 31 && $ord != 127) {
+                $post = substr($post, 0, $i + 1);
                 return $post;
             }
         }
@@ -217,13 +231,14 @@ abstract class BaseApiController extends Rest{
     /**
      * @param $key
      * @param string $default
-     * @param string $emptyErrMsg  为空时的报错
+     * @param string $emptyErrMsg 为空时的报错
      * @return mixed
      */
-    public function _get($key,$default='',$emptyErrMsg=''){
-        $value = Request::instance()->get($key,$default);
+    public function _get($key, $default = '', $emptyErrMsg = '')
+    {
+        $value = Request::get($key, $default);
 
-        if($default == $value && !empty($emptyErrMsg)){
+        if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
         }
         return $value;
@@ -236,17 +251,19 @@ abstract class BaseApiController extends Rest{
      * @param string $emptyErrMsg
      * @return string
      */
-    public function _header($key,$default='',$emptyErrMsg = ''){
+    public function _header($key, $default = '', $emptyErrMsg = '')
+    {
 
-        $value = Request::instance()->header($key);
+        $value = Request::header($key);
 
-        if($default == $value && !empty($emptyErrMsg)){
+        if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
         }
         return $value;
     }
 
-    protected function apiReturnSuc($data){
+    protected function apiReturnSuc($data)
+    {
         $msg = 'success';
         $code = 0;
         if ($data instanceof CallResult) {
@@ -255,7 +272,7 @@ abstract class BaseApiController extends Rest{
             $data = $data->getData();
         }
 
-        $this->ajaxReturn(['code'=>$code, 'data'=>$data, 'msg'=>$msg, 'notify_id'=>$this->allData->getNotifyId()]);
+        $this->ajaxReturn(['code' => $code, 'data' => $data, 'msg' => $msg, 'notify_id' => $this->allData->getNotifyId()]);
     }
 
 }

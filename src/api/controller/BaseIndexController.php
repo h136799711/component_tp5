@@ -81,6 +81,9 @@ abstract class BaseIndexController extends BaseApiController
         $this->domainObject = $object;
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     protected function callMethod()
     {
         // 4. 调用方法, 反射注入参数

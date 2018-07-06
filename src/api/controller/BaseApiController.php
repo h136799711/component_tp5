@@ -13,7 +13,6 @@ use by\component\encrypt\interfaces\TransportInterface;
 use by\infrastructure\base\CallResult;
 
 use think\Controller;
-use think\facade\Request;
 
 
 /**
@@ -106,10 +105,10 @@ abstract class BaseApiController extends Controller
         $this->allData->setClientId($clientId);
         $this->allData->setServiceType($serviceType);
         // 2. 可以为空
-        $this->allData->setServiceVersion(Request::param('service_version', 100));
-        $this->allData->setNotifyId(Request::param('notify_id', '0'));
+        $this->allData->setServiceVersion($this->request->param('service_version', 100));
+        $this->allData->setNotifyId($this->request->param('notify_id', '0'));
 
-        $data = Request::param();
+        $data = $this->request->param();
         $data['client_id'] = $this->getClientId();
         $data['client_secret'] = $this->getClientSecret();
         $this->allData->setData($data);
@@ -143,9 +142,10 @@ abstract class BaseApiController extends Controller
 
     public function _param($key, $default = '', $emptyErrMsg = '')
     {
-        $value = Request::post($key, $default);
+
+        $value =  $this->request->post($key, $default);
         if ($value == $default || empty($value)) {
-            $value = Request::get($key, $default);
+            $value = $this->request->get($key, $default);
         }
 
         if ($default == $value && !empty($emptyErrMsg)) {
@@ -202,7 +202,7 @@ abstract class BaseApiController extends Controller
     public function _post($key, $default = '', $emptyErrMsg = '')
     {
 
-        $value = Request::post($key, $default);
+        $value = $this->request->post($key, $default);
 
         if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
@@ -236,7 +236,7 @@ abstract class BaseApiController extends Controller
      */
     public function _get($key, $default = '', $emptyErrMsg = '')
     {
-        $value = Request::get($key, $default);
+        $value = $this->request->get($key, $default);
 
         if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);
@@ -254,7 +254,7 @@ abstract class BaseApiController extends Controller
     public function _header($key, $default = '', $emptyErrMsg = '')
     {
 
-        $value = Request::header($key);
+        $value = $this->request->header($key);
 
         if ($default == $value && !empty($emptyErrMsg)) {
             $this->apiReturnErr($emptyErrMsg);

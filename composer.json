@@ -4,10 +4,9 @@
   "type": "library",
   "license": "MIT",
   "keywords": [
-    "itboye",
     "h136799711"
   ],
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "authors": [
     {
       "name": "hebidu",
@@ -29,8 +28,9 @@
   },
   "require": {
     "php": ">=5.6",
-    "topthink/framework": "5.1.14",
-    "itboye/architecture": "1.0.20180329"
+    "topthink/framework": "5.1.31",
+    "dbh/core": "^1.0",
+    "itboye/component_encrypt": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "6.5.x-dev"
